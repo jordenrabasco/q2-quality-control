@@ -42,8 +42,6 @@ def _check_prev_inputs(table, metadata, prev_control_column,
                     if name in table.index.values:
                         indic = indic + 1
                 if indic < 5:
-                    '''raise ValueError('At least 5 Control Samples needed '
-                                    + str(indic) + ' found')'''
                     print("We recommend 5 control samples - " +
                           str(indic) + " found")
 
