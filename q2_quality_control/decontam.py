@@ -74,10 +74,8 @@ def _check_column_inputs(table, metadata, method, freq_concentration_column,
         if freq_concentration_column is not None:
             print("Warning: --p-freq-concentration-column given, but" +
                   " disregarded")
-        _check_prev_inputs(table, metadata,
-                           method, freq_concentration_column,
-                           prev_control_column, prev_control_indicator,
-                           method)
+        _check_prev_inputs(table, metadata, prev_control_column,
+                           prev_control_indicator, method)
     elif method == 'frequency':
         if prev_control_column is not None:
             print("Warning: --prev-control-column given, but" +
