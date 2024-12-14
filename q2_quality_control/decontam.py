@@ -17,46 +17,37 @@ from ._utilities import _run_command
 def _check_prev_inputs(table, metadata, prev_control_column,
                        prev_control_indicator, method):
     if prev_control_column is None or prev_control_indicator is None:
-        raise ValueError('For the ' + str(method) + 'method '
+        raise ValueError('For the ' + str(method) + ' method '
                          'please check that input parameters'
                          ' --prev-control-column and '
                          '--p-prev-control-indicator are being utilized')
-    else:
-        if prev_control_column not in metadata.columns:
-            raise ValueError('Prevalence column not found, please '
-                             'select from:\n'
-                             + str(', '.join(metadata.columns)))
-        else:
-            if prev_control_indicator not in list(
-                    metadata[prev_control_column]):
-                raise ValueError('No control values found, please select '
-                                 'from:\n' +
-                                 str(', '.join(metadata[prev_control_column]
-                                               .unique())))
-            else:
-                prev_controls = metadata.loc[
-                    metadata[prev_control_column] == prev_control_indicator]
-                prev_sample_names = prev_controls.index.values
-                indic = 0
-                for name in prev_sample_names:
-                    if name in table.index.values:
-                        indic = indic + 1
-                if indic < 5:
-                    print("We recommend 5 control samples - " +
-                          str(indic) + " found")
+    if prev_control_column not in metadata.columns:
+        raise ValueError('Prevalence column not found, please '
+                         'select from:\n'
+                         + str(', '.join(metadata.columns)))
+    if prev_control_indicator not in list(metadata[prev_control_column]):
+        raise ValueError('No control values found, please select '
+                         'from:\n' +
+                         str(', '.join(metadata[prev_control_column]
+                                       .unique())))
+    prev_controls = metadata.loc[
+        metadata[prev_control_column] == prev_control_indicator]
+    indic = prev_controls.index.intersection(table.index).size
+    if indic < 5:
+        print("We recommend 5 control samples - " +
+              str(indic) + " found")
 
 
 def _check_freq_inputs(metadata, freq_concentration_column, method):
     if freq_concentration_column is None:
-        raise ValueError('For the ' + str(method) + 'method please check '
+        raise ValueError('For the ' + str(method) + ' method please check '
                          'that input parameter'
                          ' --p-freq-concentration-column is '
                          'being utilized')
-    else:
-        if freq_concentration_column not in metadata.columns:
-            raise ValueError('Frequency column not found, please '
-                             'select from:\n'
-                             + str(', '.join(metadata.columns)))
+    if freq_concentration_column not in metadata.columns:
+        raise ValueError('Frequency column not found, please '
+                         'select from:\n'
+                         + str(', '.join(metadata.columns)))
 
 
 def _check_column_inputs(table, metadata, method, freq_concentration_column,
@@ -72,17 +63,17 @@ def _check_column_inputs(table, metadata, method, freq_concentration_column,
                          + str(', '.join(no_info)))
     if method == 'prevalence':
         if freq_concentration_column is not None:
-            print("Warning: --p-freq-concentration-column given, but" +
-                  " disregarded")
+            raise ValueError('--p-freq-concentration-column given, but'
+                             ' cannot be used with the prevalence method')
         _check_prev_inputs(table, metadata, prev_control_column,
                            prev_control_indicator, method)
     elif method == 'frequency':
         if prev_control_column is not None:
-            print("Warning: --prev-control-column given, but" +
-                  " disregarded")
+            raise ValueError('--prev-control-column given, but'
+                             ' cannot be used with the frequency method')
         if prev_control_indicator is not None:
-            print("Warning: --p-prev-control-indicator given, but" +
-                  " disregarded")
+            raise ValueError('--p-prev-control-indicator given, but'
+                             ' cannot be used with the frequency method')
         _check_freq_inputs(metadata, freq_concentration_column, method)
     else:
         _check_prev_inputs(table, metadata, prev_control_column,
@@ -113,7 +104,6 @@ def decontam_identify(table: pd.DataFrame,
     metadata = metadata.to_dataframe()
     _check_column_inputs(table, metadata, method, freq_concentration_column,
                          prev_control_column, prev_control_indicator)
-    print("All approriate inputs found")
     with tempfile.TemporaryDirectory() as temp_dir_name:
         track_fp = os.path.join(temp_dir_name, 'track.tsv')
         ASV_dest = os.path.join(temp_dir_name, 'temp_ASV_table.csv')
