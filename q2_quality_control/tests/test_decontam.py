@@ -123,7 +123,8 @@ class TestIdentify(TestPluginBase):
                 method='frequency',
                 freq_concentration_column='quant_reading',
                 prev_control_column='Sample_or_Control')
-        self.assertIn("--prev-control-column", str(context.exception))
+        self.assertIn("--p-prev-control-column given, but cannot be used",
+                      str(context.exception))
 
     def test_freq_prev_control_col_indic_error_raised(self):
         with self.assertRaises(ValueError) as context:
@@ -133,7 +134,8 @@ class TestIdentify(TestPluginBase):
                 method='frequency',
                 freq_concentration_column='quant_reading',
                 prev_control_indicator='Control Sample')
-        self.assertIn("--p-prev-control-indicator", str(context.exception))
+        self.assertIn("--p-prev-control-indicator given, but cannot be used",
+                      str(context.exception))
 
     def test_freq_params_error_raised(self):
         with self.assertRaises(ValueError) as context:
@@ -141,25 +143,28 @@ class TestIdentify(TestPluginBase):
                 table=self.asv_table,
                 metadata=self.metadata_input,
                 method='frequency')
-        self.assertIn("--p-freq-concentration-column", str(context.exception))
+        self.assertIn("--p-freq-concentration-column is being utilized",
+                      str(context.exception))
 
-    def test_prev_params_no_indic_error_raised(self):
+    def test_prev_no_indic_param_error_raised(self):
         with self.assertRaises(ValueError) as context:
             decontam_identify(
                 table=self.asv_table,
                 metadata=self.metadata_input,
                 method='prevalence',
                 prev_control_column='Sample_or_Control')
-        self.assertIn("--prev-control-column ", str(context.exception))
+        self.assertIn("--p-prev-control-column and --p-prev-control-indicator",
+                      str(context.exception))
 
-    def test_prev_params_no_col_error_raised(self):
+    def test_prev_no_col_param_error_raised(self):
         with self.assertRaises(ValueError) as context:
             decontam_identify(
                 table=self.asv_table,
                 metadata=self.metadata_input,
                 method='prevalence',
                 prev_control_indicator='Control Sample')
-        self.assertIn("--prev-control-column ", str(context.exception))
+        self.assertIn("--p-prev-control-column and --p-prev-control-indicator",
+                      str(context.exception))
 
     def test_prev_freq_params_error_raised(self):
         with self.assertRaises(ValueError) as context:
@@ -170,11 +175,8 @@ class TestIdentify(TestPluginBase):
                 prev_control_indicator='Control Sample',
                 prev_control_column='Sample_or_Control',
                 freq_concentration_column='quant_reading')
-        self.assertIn("--p-freq-concentration-column", str(context.exception))
-
-
-def _sort_seqs(seqs):
-    return sorted(list(seqs), key=lambda x: x.metadata['id'])
+        self.assertIn("--p-freq-concentration-column given, but cannot be",
+                      str(context.exception))
 
 
 class TestRemove(TestPluginBase):

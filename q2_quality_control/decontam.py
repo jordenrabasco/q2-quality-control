@@ -19,7 +19,7 @@ def _check_prev_inputs(table, metadata, prev_control_column,
     if prev_control_column is None or prev_control_indicator is None:
         raise ValueError('For the ' + str(method) + ' method '
                          'please check that input parameters'
-                         ' --prev-control-column and '
+                         '--p-prev-control-column and '
                          '--p-prev-control-indicator are being utilized')
     if prev_control_column not in metadata.columns:
         raise ValueError('Prevalence column not found, please '
@@ -69,7 +69,7 @@ def _check_column_inputs(table, metadata, method, freq_concentration_column,
                            prev_control_indicator, method)
     elif method == 'frequency':
         if prev_control_column is not None:
-            raise ValueError('--prev-control-column given, but'
+            raise ValueError('--p-prev-control-column given, but'
                              ' cannot be used with the frequency method')
         if prev_control_indicator is not None:
             raise ValueError('--p-prev-control-indicator given, but'
